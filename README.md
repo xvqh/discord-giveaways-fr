@@ -31,18 +31,19 @@ You can read this example bot on GitHub: [discord-giveaways-bot](https://github.
 
 ### Launch of the module
 
-Required Discord Intents: `Guilds` and `GuildMessageReactions`.  
-Optional Discord Privileged Intent for better performance: `GuildMembers`.
+Required Discord Intents: `GUILDS` and `GUILD_MESSAGE_REACTIONS`.  
+Optional Discord Privileged Intent for better performance: `GUILD_MEMBERS`.
 
 ```js
 const Discord = require('discord.js');
 const client = new Discord.Client({
     intents: [
-        Discord.IntentsBitField.Flags.Guilds,
-        Discord.IntentsBitField.Flags.GuildMessageReactions,
-        Discord.IntentsBitField.Flags.GuildMembers // Optional, for better performance
+        Discord.Intents.FLAGS.GUILDS,
+        Discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+        Discord.Intents.FLAGS.GUILD_MEMBERS // Optional, for better performance
     ]
 });
+
 // Requires Manager from discord-giveaways
 const { GiveawaysManager } = require('discord-giveaways');
 const manager = new GiveawaysManager(client, {
@@ -56,9 +57,11 @@ const manager = new GiveawaysManager(client, {
 });
 // We now have a giveawaysManager property to access the manager everywhere!
 client.giveawaysManager = manager;
+
 client.on('ready', () => {
     console.log('Bot is ready!');
 });
+
 client.login(process.env.DISCORD_BOT_TOKEN);
 ```
 
@@ -73,12 +76,15 @@ You can pass an options object to customize the giveaways. Here is a list of the
 ```js
 client.on('interactionCreate', (interaction) => {
     const ms = require('ms');
-    if (interaction.isChatInputCommand() && interaction.commandName === 'start') {
+
+    if (interaction.isCommand() && interaction.commandName === 'start') {
         // /start 2d 1 Awesome prize!
         // Will create a giveaway with a duration of two days, with one winner and the prize will be "Awesome prize!"
+
         const duration = interaction.options.getString('duration');
         const winnerCount = interaction.options.getInteger('winners');
         const prize = interaction.options.getString('prize');
+
         client.giveawaysManager
             .start(interaction.channel, {
                 duration: ms(duration),
@@ -94,7 +100,7 @@ client.on('interactionCreate', (interaction) => {
 ```
 
 -   **options.duration**: the giveaway duration.
--   **options.prize**: the giveaway prize.
+-   **options.prize**: the giveaway prize. You can [access giveaway properties](https://github.com/Androz2091/discord-giveaways#access-giveaway-properties-in-messages).
 -   **options.winnerCount**: the number of giveaway winners.
 -   **[and many other optional parameters to customize the giveaway - read documentation](https://discord-giveaways.js.org/global.html#GiveawayStartOptions)**
 
@@ -115,6 +121,7 @@ const giveaway =
     client.giveawaysManager.giveaways.find((g) => g.guildId === interaction.guildId && g.prize === query) ||
     // Search with messageId
     client.giveawaysManager.giveaways.find((g) => g.guildId === interaction.guildId && g.messageId === query);
+
 // If no giveaway was found
 if (!giveaway) return interaction.reply(`Unable to find a giveaway for \`${query}\`.`);
 ```
@@ -123,7 +130,7 @@ if (!giveaway) return interaction.reply(`Unable to find a giveaway for \`${query
 
 ```js
 client.on('interactionCreate', (interaction) => {
-    if (interaction.isChatInputCommand() && interaction.commandName === 'reroll') {
+    if (interaction.isCommand() && interaction.commandName === 'reroll') {
         const messageId = interaction.options.getString('message_id');
         client.giveawaysManager
             .reroll(messageId)
@@ -149,7 +156,7 @@ client.on('interactionCreate', (interaction) => {
 
 ```js
 client.on('interactionCreate', (interaction) => {
-    if (interaction.isChatInputCommand() && interaction.commandName === 'edit') {
+    if (interaction.isCommand() && interaction.commandName === 'edit') {
         const messageId = interaction.options.getString('message_id');
         client.giveawaysManager
             .edit(messageId, {
@@ -179,7 +186,7 @@ client.on('interactionCreate', (interaction) => {
 
 ```js
 client.on('interactionCreate', (interaction) => {
-    if (interaction.isChatInputCommand() && interaction.commandName === 'delete') {
+    if (interaction.isCommand() && interaction.commandName === 'delete') {
         const messageId = interaction.options.getString('message_id');
         client.giveawaysManager
             .delete(messageId)
@@ -201,7 +208,7 @@ client.on('interactionCreate', (interaction) => {
 
 ```js
 client.on('interactionCreate', (interaction) => {
-    if (interaction.isChatInputCommand() && interaction.commandName === 'end') {
+    if (interaction.isCommand() && interaction.commandName === 'end') {
         const messageId = interaction.options.getString('message_id');
         client.giveawaysManager
             .end(messageId)
@@ -221,7 +228,7 @@ client.on('interactionCreate', (interaction) => {
 
 ```js
 client.on('interactionCreate', (interaction) => {
-    if (interaction.isChatInputCommand() && interaction.commandName === 'pause') {
+    if (interaction.isCommand() && interaction.commandName === 'pause') {
         const messageId = interaction.options.getString('message_id');
         client.giveawaysManager
             .pause(messageId)
@@ -236,9 +243,9 @@ client.on('interactionCreate', (interaction) => {
 ```
 
 -   **options.content**: the text of the embed when the giveaway is paused. You can [access giveaway properties](https://github.com/Androz2091/discord-giveaways#access-giveaway-properties-in-messages).
--   **options.unpauseAfter**: the number of milliseconds, or a timestamp in milliseconds, after which the giveaway will automatically unpause.
+-   **options.unPauseAfter**: the number of milliseconds after which the giveaway will automatically unpause.
 -   **options.embedColor**: the color of the embed when the giveaway is paused.
--   **options.infiniteDurationText**: The text that gets displayed next to `GiveawayMessages#drawing` in the paused embed, when there is no `unpauseAfter`.  
+-   **options.infiniteDurationText**: The text that gets displayed next to `GiveawayMessages#drawing` in the paused embed, when there is no `unPauseAfter`.  
     ^^^ You can [access giveaway properties](https://github.com/Androz2091/discord-giveaways#access-giveaway-properties-in-messages).
 
 ⚠️ **Note**: the pause function overwrites/edits the [pauseOptions object property](https://github.com/Androz2091/discord-giveaways#pause-options) of a giveaway!
@@ -247,7 +254,7 @@ client.on('interactionCreate', (interaction) => {
 
 ```js
 client.on('interactionCreate', (interaction) => {
-    if (interaction.isChatInputCommand() && interaction.commandName === 'unpause') {
+    if (interaction.isCommand() && interaction.commandName === 'unpause') {
         const messageId = interaction.options.getString('message_id');
         client.giveawaysManager
             .unpause(messageId)
@@ -266,8 +273,10 @@ client.on('interactionCreate', (interaction) => {
 ```js
 // A list of all the giveaways
 const allGiveaways = client.giveawaysManager.giveaways; // [ {Giveaway}, {Giveaway} ]
+
 // A list of all the giveaways on the server with Id "1909282092"
 const onServer = client.giveawaysManager.giveaways.filter((g) => g.guildId === '1909282092');
+
 // A list of the current active giveaways (not ended)
 const notEnded = client.giveawaysManager.giveaways.filter((g) => !g.ended);
 ```
@@ -290,6 +299,7 @@ client.giveawaysManager.start(interaction.channel, {
 
 ```js
 const roleName = 'Nitro Boost';
+
 client.giveawaysManager.start(interaction.channel, {
     duration: 60000,
     winnerCount: 1,
@@ -325,7 +335,7 @@ client.giveawaysManager.start(interaction.channel, {
     lastChance: {
         enabled: true,
         content: '⚠️ **LAST CHANCE TO ENTER !** ⚠️',
-        threshold: 10_000,
+        threshold: 5000,
         embedColor: '#FF0000'
     }
 });
@@ -351,7 +361,7 @@ client.giveawaysManager.start(interaction.channel, {
     pauseOptions: {
         isPaused: true,
         content: '⚠️ **THIS GIVEAWAY IS PAUSED !** ⚠️',
-        unpauseAfter: null,
+        unPauseAfter: null,
         embedColor: '#FFFF00',
         infiniteDurationText: '`NEVER`'
     }
@@ -361,9 +371,9 @@ client.giveawaysManager.start(interaction.channel, {
 -   **pauseOptions.isPaused**: if the giveaway is paused.
 -   **pauseOptions.content**: the text of the embed when the giveaway is paused.  
     ^^^ You can [access giveaway properties](https://github.com/Androz2091/discord-giveaways#access-giveaway-properties-in-messages).
--   **pauseOptions.unpauseAfter**: the number of milliseconds, or a timestamp in milliseconds, after which the giveaway will automatically unpause.
+-   **pauseOptions.unPauseAfter**: the number of milliseconds, or a timestamp in milliseconds, after which the giveaway will automatically unpause.
 -   **pauseOptions.embedColor**: the color of the embed when the giveaway is paused.
--   **pauseOptions.infiniteDurationText**: The text that gets displayed next to `GiveawayMessages#drawing` in the paused embed, when there is no `unpauseAfter`.  
+-   **pauseOptions.infiniteDurationText**: The text that gets displayed next to `GiveawayMessages#drawing` in the paused embed, when there is no `unPauseAfter`.  
     ^^^ You can [access giveaway properties](https://github.com/Androz2091/discord-giveaways#access-giveaway-properties-in-messages).
 
 <a href="https://zupimages.net/viewer.php?id=21/24/dxhk.png">
@@ -405,8 +415,8 @@ The format, including all currently available options, looks like this:
 ```js
 message: {
     content: '',
-    embed: new Discord.EmbedBuilder(),
-    components: [new Discord.ActionRowBuilder()],
+    embed: new Discord.MessageEmbed(),
+    components: [new Discord.MessageActionRow()],
     replyToGiveaway: true
 }
 ```
@@ -439,7 +449,6 @@ You can also pass a `messages` parameter for the `start()` function, if you want
 
 -   **options.messages.giveaway**: the message that will be displayed above the embeds.
 -   **options.messages.giveawayEnded**: the message that will be displayed above the embeds when the giveaway is ended.
--   **options.messages.title**: the title of the giveaway embed. Will default to the prize of the giveaway if the value is not a string.
 -   **options.messages.drawing**: the message that displays the drawing timestamp.
 -   **options.messages.dropMessage**: the message that will be displayed for drop giveaways.
 -   **options.messages.inviteToParticipate**: the message that invites users to participate.
@@ -458,6 +467,7 @@ For example:
 const duration = interaction.options.getString('duration');
 const winnerCount = interaction.options.getInteger('winners');
 const prize = interaction.options.getString('prize');
+
 client.giveawaysManager.start(interaction.channel, {
     duration: ms(duration),
     winnerCount,
@@ -465,7 +475,6 @@ client.giveawaysManager.start(interaction.channel, {
     messages: {
         giveaway: '🎉🎉 **GIVEAWAY** 🎉🎉',
         giveawayEnded: '🎉🎉 **GIVEAWAY ENDED** 🎉🎉',
-        title: '{this.prize}',
         drawing: 'Drawing: {timestamp}',
         dropMessage: 'Be the first to react with 🎉 !',
         inviteToParticipate: 'React with 🎉 to participate!',
