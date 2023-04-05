@@ -1,3 +1,7 @@
+# Credit 
+I don't own any credit and liscense of [discord-giveaways](https://www.npmjs.com/package/discord-giveaways?activeTab=readme) package it's just an remake for French people using [discord-giveaways](https://www.npmjs.com/package/discord-giveaways?activeTab=readme) for their bot.
+All credit goes to [Androzz2091 and his team](https://github.com/Androz2091/) and thanks for your works. ❤
+
 # Discord Giveaways
 
 [![discordBadge](https://img.shields.io/badge/Chat-Click%20here-7289d9?style=for-the-badge&logo=discord)](https://discord.gg/r5mb9r5WXv)
